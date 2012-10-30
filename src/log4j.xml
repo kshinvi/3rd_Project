@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd" >
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
+ 
+ 	
+
+	<appender name="stdout" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<!-- <param name="ConversionPattern" value="%d{ABSOLUTE} %p - %C{1}.%M(%L) | %m%n"/> -->
+			<!-- <param name="ConversionPattern" value="[%d],[%C],[%M],[%5p],[%t],(%F:%L) - %m%n"/>-->
+			<param name="ConversionPattern" value="[%d{ABSOLUTE}],[%C{1}.%M],[%5p] - %m%n"/>
+		</layout>
+	</appender>
+	
+
+<!--
+CREATE TABLE EMN_LOGS (
+	USER_ID VARCHAR(20),
+    DATED   DATE,
+    LOGGER  VARCHAR(50),
+    LEVEL   VARCHAR(10),
+    MESSAGE VARCHAR(1000)
+); 
+ -->
+
+	<appender name="db" class="org.apache.log4j.jdbc.JDBCAppender">
+		<param name="driver" value="oracle.jdbc.driver.OracleDriver"/>
+		<param name="URL" value="jdbc:oracle:thin:@203.233.196.185:1521:xe"/>
+		<param name="user" value="emn"/>
+		<param name="password" value="momiji"/>
+		<param name="sql" value="INSERT INTO EMN_LOGS VALUES('%x','%d','%C','%p','%m')"/>
+		<layout class="org.apache.log4j.PatternLayout"/>
+	</appender>
+ 
+ 	
+	
+	
+	<logger name="com.opensymphony.xwork2">
+		<level value="OFF" />
+	</logger>
+	
+	<logger name="org.apache.struts2">
+		<level value="OFF" />
+	</logger>
+	
+	<logger name="freemarker.cache">
+		<level value="OFF" />
+	</logger>
+	
+	<logger name="freemarker.beans">
+		<level value="OFF" />
+	</logger>
+	
+	<logger name="com.ibatis">
+		<level value="DEBUG" />
+	</logger> 
+	
+	<root>
+		<level value="DEBUG"/>
+		<appender-ref ref="stdout"/>
+	</root>
+	
+	
+	<!-- DEBUG, INFO, WARN, ERROR, FATAL -->
+</log4j:configuration>

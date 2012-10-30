@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="study" >
+
+	<typeAlias alias="Questions" type="com.emn.study.model.Questions"/>
+	<typeAlias alias="Question" type="com.emn.study.model.Question"/>
+	<typeAlias alias="AddWordbookItem" type="com.emn.study.model.AddWordbookItem"/>
+	<typeAlias alias="Wordbook" type="com.emn.study.model.Wordbook"/>
+	<typeAlias alias="WordbookListItem" type="com.emn.study.model.WordbookListItem"/>
+	<typeAlias alias="Word" type="com.emn.content.model.Word"/>
+	
+	<!-- 문제지만들기 시작 -->
+	
+	<resultMap id="QuestionsResult" class="Questions">
+	  	<result property="questionsPk" column="QUESTIONS_PK"/>
+	  	<result property="questionsName" column="QUESTIONS_NAME"/>
+	  	<result property="sgwaName" column="SGWA_NAME"/>
+	  	<result property="egwaName" column="EGWA_NAME"/>
+	  	<result property="qcount" column="QCOUNT"/>
+	  	<result property="qgubun" column="QGUBUN"/>
+	  	<result property="agubunHi" column="AGUBUN_HI"/>
+	  	<result property="agubunKa" column="AGUBUN_KA"/>
+	  	<result property="agubunKan" column="AGUBUN_KAN"/>
+	  	<result property="agubunHan" column="AGUBUN_HAN"/>
+	  	<result property="memberPk" column="MEMBER_PK"/>
+	  	<result property="regdate" column="REGDATE"/>
+	</resultMap>
+	
+	<!-- 문제지목록 카운팅 -->
+	<select id="getAllQuestionsCnt" parameterClass="java.util.Map" resultClass="Questions">
+		<isNotEmpty property="memberPk">
+			select count(QUESTIONS_PK) cnt from questions where member_pk = $memberPk$
+		</isNotEmpty>
+	</select>
+	
+	<!-- 문제지목록 조회 -->	
+	<select id="getAllQuestions" parameterClass="java.util.Map" resultMap="QuestionsResult">
+		<isNotEmpty property="memberPk">
+		<isNotEmpty property="start">
+		  <isNotEmpty property="end">
+			SELECT * FROM ( 
+				SELECT  A.*, ROWNUM RNUM FROM
+		       (
+			</isNotEmpty>
+		</isNotEmpty> 
+		select * from questions WHERE member_pk = #memberPk# order by regdate desc
+		<isNotEmpty property="start">
+			<isNotEmpty property="end">
+				) A
+				WHERE ROWNUM &lt;= $end$
+			)
+			WHERE RNUM &gt; $start$
+			</isNotEmpty>
+		</isNotEmpty>
+		</isNotEmpty>
+	</select>
+	
+	<!-- 문제지 추가 -->
+	<insert id="addQuestions">
+		<selectKey keyProperty="questionsPk" resultClass="int">
+			select questions_pk_seq.nextval from dual
+		</selectKey>
+		insert into questions values (
+			#questionsPk#,
+			#questionsName#,
+		 	#sgwaName#,
+		 	#egwaName#,
+		 	#qcount#,
+		 	#qgubun#,
+		 	#agubunHi#,
+		 	#agubunKa#,
+		 	#agubunKan#,
+		 	#agubunHan#,
+		 	#memberPk#,
+		 	sysdate
+		)
+	</insert>
+	
+	<!-- 문제지 가져오기 -->
+	<select id="getOneQuestions" parameterClass="Questions" resultMap="QuestionsResult">
+		select * from questions where questions_pk = #questionsPk#
+	</select>
+	
+	<!-- 범위의 모든 단어들 가져오기 -->
+	<select id="getAllWordsForQuestions" parameterClass="Questions" resultClass="Question">
+		select word_pk wordPk
+			from 
+				(select * from word where 1 = 1
+				<isEqual property="qgubun" compareValue="1">
+				 and hiragana is not null
+				 <isEqual property="cntAgubuns" compareValue="1">
+					 <isNotEmpty property="agubunKan" prepend="AND">
+					  kanji is not null
+					 </isNotEmpty>
+				 </isEqual> 
+				</isEqual>
+				<isEqual property="qgubun" compareValue="2" > and katakana is not null </isEqual>
+				<isEqual property="qgubun" compareValue="3" > and kanji is not null </isEqual>
+				<isEqual property="qgubun" compareValue="4" >
+				 and hangul is not null
+				<isEqual property="cntAgubuns" compareValue="1">
+					 <isNotEmpty property="agubunKan" prepend="AND">
+					  kanji is not null
+					 </isNotEmpty>
+					 <isNotEmpty property="agubunHi" prepend="AND">
+					  hiragana is not null
+					 </isNotEmpty>
+					 <isNotEmpty property="agubunKa" prepend="AND">
+					  katakana is not null
+					 </isNotEmpty>
+				 </isEqual>
+				 <isEqual property="cntAgubuns" compareValue="2">
+					 <isNotEmpty property="agubunKan" >
+					 <isNotEmpty property="agubunHi" prepend="AND">
+					  kanji is not null or hiragana is not null
+					 </isNotEmpty>
+					 </isNotEmpty>
+					 <isNotEmpty property="agubunHi" >
+					 <isNotEmpty property="agubunKa" prepend="AND">
+					  hiragana is not null or katakana is not null
+					 </isNotEmpty>
+					 </isNotEmpty>
+					 <isNotEmpty property="agubunKa" >
+					 <isNotEmpty property="agubunKan" prepend="AND">
+					  katakana is not null or kanji is not null
+					 </isNotEmpty>
+					 </isNotEmpty>
+				 </isEqual>  
+				</isEqual>
+				) a,
+				(select gwa_pk 
+				from gwa
+				where (select gwa_num from gwa where gwa_name=#sgwaName#) &lt;= gwa_num
+				and (select gwa_num from gwa where gwa_name=#egwaName#) &gt;= gwa_num
+				) b 
+			where a.gwa_pk = b.gwa_pk
+	</select>
+	
+	<!-- 문제지에 해당하는 단어 저장 -->
+	<insert id="addQuestion" parameterClass="Question">
+		insert into question values (question_pk_seq.nextval, #questionsPk#, #wordPk#)
+	</insert>
+	
+	<!-- 문제지에 해당하는 단어 가져오기 -->
+	<select id="getQuestion" parameterClass="Questions" resultClass="Word">
+		select hiragana, katakana, kanji, hangul 
+		from word a, question b
+		where a.word_pk = b.word_pk
+		and b.questions_pk = #questionsPk#
+	</select>
+	
+	<!-- 문제지만들기 끝 -->
+	
+	
+	
+	<!-- 단어장 관련 시작 -->
+	
+	<!-- 단어 있는지 확인... 단순히 있는지만 확인 -->
+	<select id="selectWordbookItem" parameterClass="AddWordbookItem" resultClass="AddWordbookItem">
+		SELECT
+			member_pk memberPk,
+			word_pk wordPk
+		FROM
+			wordbook
+		WHERE
+			member_pk = #memberPk#
+			AND word_pk = #wordPk#
+	</select>
+	
+	<!-- 단어저장 -->
+	<insert id="insertWordbookItem" parameterClass="AddWordbookItem">
+		INSERT
+		INTO
+			wordbook
+			(
+				wordbook_pk, remem_flag, wlevel, member_pk, word_pk, regdate
+			)
+		VALUES
+			(
+				WORDBOOK_PK_SEQ.NEXTVAL, 'n', '3', #memberPk#, #wordPk#, SYSDATE 
+			) 
+	</insert>
+	
+	
+	<!-- 단어장 데이터가져오기. memberPk만 이용 -->
+	<select id="selectWordbook" parameterClass="com.emn.study.model.WordbookConditionBean" resultClass="WordbookListItem">
+		SELECT
+			wordbook_pk wordbookPk,
+			remem_flag rememFlag,
+			wordbook.wlevel wlevel,
+			word.kanji kanji,
+			word.hiragana hiragana,
+			word.katakana katakana,
+			word.hangul hangul,
+			word.wclass wclass,
+			word.wclass2 wclass2
+		FROM
+			wordbook, word
+		WHERE
+			member_pk = #memberPk#
+			AND wordbook.word_pk = word.word_pk
+			AND (regdate &gt;= #startRegDate# AND regdate &lt;= #endRegDate#)
+			AND (
+				<iterate prepend="word.wclass IN " property="wClass" open="(" close=")" conjunction=",">
+					#wClass[]#
+				</iterate>)
+			AND (
+				<iterate prepend="remem_flag IN " property="rememberFlag" open="(" close=")" conjunction=",">
+					#rememberFlag[]#
+				</iterate>)
+			AND (
+				<iterate prepend="wordbook.wlevel IN " property="wLevel" open="(" close=")" conjunction=",">
+					#wLevel[]#
+				</iterate>)
+			AND (
+				word.hiragana LIKE '%'||#wordValue#||'%'
+				OR word.katakana LIKE '%'||#wordValue#||'%'				
+				OR word.kanji LIKE '%'||#wordValue#||'%'
+				OR word.hangul LIKE '%'||#wordValue#||'%'
+				)
+	</select>
+	
+	<!-- 단어장 암기여부 변경 -->
+	<update id="updateWordbookRememberFlag" parameterClass="com.emn.study.model.ChangeRememberFlagBean">
+		UPDATE
+			wordbook
+		SET
+			remem_flag = #rememberFlag#
+		WHERE
+			wordbook_pk = #wordbookPk#
+	</update>
+	
+	<!-- 단어장 레벨 변경 -->
+	<update id="updateWordbookWlevel" parameterClass="com.emn.study.model.ChangeWlevelBean">
+		UPDATE
+			wordbook
+		SET
+			wlevel = #wlevel#
+		WHERE
+			wordbook_pk = #wordbookPk#
+	</update>
+	
+	<!-- 단어장 지우기 -->
+	<delete id="deleteWordbookItem">
+		DELETE
+			wordbook
+		WHERE
+			member_pk = #memberPk#
+			AND wordbook_pk = #wordbookPk#
+	</delete>
+	<!-- 단어장 관련 끝 -->
+	
+</sqlMap>

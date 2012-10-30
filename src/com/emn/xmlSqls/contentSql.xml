@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="content" >
+
+	<typeAlias alias="Word" type="com.emn.content.model.Word"/>
+	<typeAlias alias="Other" type="com.emn.content.model.Other"/>
+	<typeAlias alias="Gwa" type="com.emn.content.model.Gwa"/>
+	<typeAlias alias="Content" type="com.emn.content.model.Content"/>
+	<typeAlias alias="Lecture" type="com.emn.lecture.model.Lecture"/>
+	<typeAlias alias="Student" type="com.emn.member.model.Student"/>
+	<typeAlias alias="Learn" type="com.emn.lecture.model.Learn"/>
+	
+	<resultMap id="WordResult" class="Word">
+	  	<result property="wordPk" column="WORD_PK"/>
+	  	<result property="wclass" column="WCLASS"/>
+	  	<result property="wclass2" column="WCLASS2"/>
+	  	<result property="hiragana" column="HIRAGANA"/>
+	  	<result property="katakana" column="KATAKANA"/>
+	  	<result property="kanji" column="KANJI"/>
+	  	<result property="hangul" column="HANGUL"/>
+	  	<result property="mp3Fname" column="MP3_FNAME"/>
+	  	<result property="imgFname" column="IMG_FNAME"/>
+	  	<result property="wlevel" column="WLEVEL"/>
+	  	<result property="wnumber" column="WNUMBER"/>
+	  	<result property="gwaPk" column="GWA_PK"/>
+	</resultMap>
+	
+	<resultMap id="LectureResult" class="Lecture">
+		<result property="lecturePk" column="lecture_pk"/>
+	  	<result property="lectureName" column="lecture_name"/>
+		<result property="lectureStartdate" column="lecture_startdate"/>
+		<result property="lectureEnddate" column="lecture_enddate"/>
+		<result property="lectureTeacherPk" column="lecture_teacher_pk"/>
+		<result property="lectureRegdate" column="lecture_regdate"/>
+	</resultMap>
+	
+	<!-- 단어관리 시작 -->
+	
+	<select id="getWordList" parameterClass="java.util.Map" resultMap="WordResult">
+		<isNotEmpty property="start">
+		  <isNotEmpty property="end">
+			SELECT * FROM ( 
+				SELECT  A.*, ROWNUM RNUM FROM
+		       (
+			</isNotEmpty>
+		</isNotEmpty> 
+		select * from word WHERE 1 = 1
+		<isNotEqual property="gwaPk" compareValue="0" prepend="AND">
+			gwa_pk = #gwaPk#
+		</isNotEqual>
+		<isNotEmpty property="hiragana" prepend="AND" >
+			HIRAGANA LIKE '%'||#hiragana#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="katakana" prepend="AND">
+			KATAKANA LIKE '%'||#katakana#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="kanji" prepend="AND">
+			KANJI LIKE '%'||#kanji#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="hangul" prepend="AND">
+			HANGUL LIKE '%'||#hangul#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="wclass" prepend="AND">
+			WCLASS = #wclass#
+		</isNotEmpty>
+		order by wnumber asc
+		<isNotEmpty property="start">
+			<isNotEmpty property="end">
+				) A
+				WHERE ROWNUM &lt;= $end$
+			)
+			WHERE RNUM &gt; $start$
+			</isNotEmpty>
+		</isNotEmpty>
+	</select>
+	
+	
+	<select id="getWordCnt" parameterClass="Word" resultClass="Word"> 
+		select count(word_pk) cnt from word WHERE 1 = 1
+		<isNotEqual property="gwaPk" compareValue="0" prepend="AND">
+			gwa_pk = #gwaPk#
+		</isNotEqual>
+		<isNotEmpty property="hiragana" prepend="AND" >
+			HIRAGANA LIKE '%'||#hiragana#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="katakana" prepend="AND">
+			KATAKANA LIKE '%'||#katakana#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="kanji" prepend="AND">
+			KANJI LIKE '%'||#kanji#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="hangul" prepend="AND">
+			HANGUL LIKE '%'||#hangul#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="wclass" prepend="AND">
+			WCLASS = #wclass#
+		</isNotEmpty>
+	</select>
+	
+	<select id="getWord" parameterClass="Word" resultMap="WordResult"> 
+		select * from word WHERE 1 = 1
+		<isNotEqual property="gwaPk" compareValue="0" prepend="AND">
+			word_pk = #wordPk#
+		</isNotEqual>
+	</select>
+	
+	<insert id="insertWord" parameterClass="Word">
+		insert into word 
+		(WORD_PK,             WNUMBER,   WCLASS,   WCLASS2,   HIRAGANA,   
+			KATAKANA,   KANJI,   HANGUL,   MP3_FNAME,  IMG_FNAME,  WLEVEL,   GWA_PK)
+		values 
+		(WORD_PK_SEQ.nextVal, #wnumber#, #wclass#, #wclass2#, #hiragana#, 
+			#katakana#, #kanji#, #hangul#, #mp3Fname#, #imgFname#, '3', #gwaPk# )
+	</insert>
+	
+	<delete id="delWord" parameterClass="Word" >
+		<isNotEmpty property="wordPk">
+			delete from word where word_pk = #wordPk# 
+		</isNotEmpty>
+	</delete>
+	
+	<!-- 단어 관리 끝  -->
+	<!-- 기타 컨텐츠 관리 시작 -->
+	
+	<select id="getOther" parameterClass="Other" resultClass="Other">
+		<isNotEqual property="gwaPk" compareValue="0" >
+			select 
+				(select xml_fname from grammar where gwa_pk = #gwaPk# ) grammarName,
+				(select xml_fname from dialog where gwa_pk = #gwaPk# ) dialogXmlName,
+				(select mp3_fname from dialog where gwa_pk = #gwaPk# ) dialogMp3Name,
+				(select img_fname from reading where gwa_pk = #gwaPk# ) readingImgName,
+				(select mp3_fname from reading where gwa_pk = #gwaPk# ) readingMp3Name,
+				(select xml_fname from reading where gwa_pk = #gwaPk# ) readingXmlName
+			from dual
+		</isNotEqual>
+	</select>
+	
+	<update id="delOther" parameterClass="Other">
+		update
+		<isEqual property="category" compareValue="dialog">dialog</isEqual>
+		<isEqual property="category" compareValue="reading">reading</isEqual>
+		<isEqual property="category" compareValue="grammar">grammar</isEqual>
+		 set 
+		 <isEqual property="ext" compareValue="xml">xml_fname</isEqual>
+		 <isEqual property="ext" compareValue="mp3">mp3_fname</isEqual>
+		 <isEqual property="ext" compareValue="img">img_fname</isEqual>
+		 = '' where gwa_pk = #delPk#
+	</update>
+	
+	<select id="getExistFileName" parameterClass="Other" resultClass="Other">
+		<isNotEqual property="gwaPk" compareValue="0" >
+			select
+				<isEqual property="category" compareValue="grammar">
+					nvl( (select xml_fname from grammar where gwa_pk = #gwaPk#), (select count(*) from grammar where gwa_pk = #gwaPk#) ) fileNm
+				</isEqual>
+				<isEqual property="category" compareValue="dialog">
+					<isEqual property="ext" compareValue="xml">
+					nvl( (select xml_fname from dialog where gwa_pk = #gwaPk#), (select count(*) from dialog where gwa_pk = #gwaPk#) ) fileNm
+					</isEqual>
+					<isEqual property="ext" compareValue="mp3">
+					nvl( (select mp3_fname from dialog where gwa_pk = #gwaPk#), (select count(*) from dialog where gwa_pk = #gwaPk#) ) fileNm
+					</isEqual>
+				</isEqual>
+				<isEqual property="category" compareValue="reading">
+					<isEqual property="ext" compareValue="xml">
+					nvl( (select xml_fname from reading where gwa_pk = #gwaPk#), (select count(*) from reading where gwa_pk = #gwaPk#) ) fileNm
+					</isEqual>
+					<isEqual property="ext" compareValue="mp3">
+					nvl( (select mp3_fname from reading where gwa_pk = #gwaPk#), (select count(*) from reading where gwa_pk = #gwaPk#) ) fileNm
+					</isEqual>
+					<isEqual property="ext" compareValue="img">
+					nvl( (select img_fname from reading where gwa_pk = #gwaPk#), (select count(*) from reading where gwa_pk = #gwaPk#) ) fileNm
+					</isEqual>
+				</isEqual>
+			from dual
+		</isNotEqual>
+	</select>
+	
+	<insert id="insertOther" parameterClass="Other">
+	
+		<isEqual property="category" compareValue="grammar">
+			insert into grammar (gram_pk, xml_fname, gwa_pk) values 
+			(gram_pk_seq.nextVal,
+			 <isEqual property="ext" compareValue="xml">#fileNm#</isEqual>
+			 <isNotEqual property="ext" compareValue="xml">''</isNotEqual>
+			, #gwaPk#) 
+		</isEqual>
+		
+		<isEqual property="category" compareValue="dialog">
+			insert into dialog (dialog_pk, mp3_fname, xml_fname, gwa_pk ) values 
+			( DIALOG_PK_SEQ.nextVal, 
+				<isEqual property="ext" compareValue="mp3">#fileNm#</isEqual>
+				<isNotEqual property="ext" compareValue="mp3">''</isNotEqual>
+			,
+				<isEqual property="ext" compareValue="xml">#fileNm#</isEqual>
+				<isNotEqual property="ext" compareValue="xml">''</isNotEqual>
+			, #gwaPk#)
+		</isEqual>
+		
+		<isEqual property="category" compareValue="reading">
+			insert into reading (reading_pk, img_fname, mp3_fname, xml_fname, gwa_pk) values
+			(reading_pk_seq.nextVal,
+				<isEqual property="ext" compareValue="img">#fileNm#</isEqual>
+				<isNotEqual property="ext" compareValue="img">''</isNotEqual>
+			,
+				<isEqual property="ext" compareValue="mp3">#fileNm#</isEqual>
+				<isNotEqual property="ext" compareValue="mp3">''</isNotEqual>
+			,
+				<isEqual property="ext" compareValue="xml">#fileNm#</isEqual>
+				<isNotEqual property="ext" compareValue="xml">''</isNotEqual>
+			, #gwaPk#
+			) 
+		</isEqual>
+				
+	</insert>
+	
+	<update id="updateOther" parameterClass="Other">
+		update
+		<isEqual property="category" compareValue="dialog">dialog</isEqual>
+		<isEqual property="category" compareValue="reading">reading</isEqual>
+		<isEqual property="category" compareValue="grammar">grammar</isEqual>
+		 set 
+		 <isEqual property="ext" compareValue="xml">xml_fname</isEqual>
+		 <isEqual property="ext" compareValue="mp3">mp3_fname</isEqual>
+		 <isEqual property="ext" compareValue="img">img_fname</isEqual>
+		 = #fileNm# where gwa_pk = #gwaPk#
+	</update>
+	
+	<!-- 기타 컨텐츠 관리 끝 -->
+	<!-- 과별 컨텐츠 관리 시작 -->
+	
+	<select id="getAllGwa" resultClass="Gwa">
+		select gwa_pk gwaPk, gwa_name gwaName, gwa_num gwaNum from gwa order by gwa_num
+	</select>
+	
+	<select id="getMaxMinGwa" resultClass="Gwa" >
+		select nvl(min(gwa_num), 0) min, nvl(max(gwa_num), 0) max from gwa
+	</select>
+	
+	<insert id="addGwa" parameterClass="Gwa">
+		<isNotEmpty property="gwaName">
+		insert into gwa values(gwa_pk_seq.nextVal, #gwaName#, (select nvl(max(gwa_num),0)+1 from gwa) )
+		</isNotEmpty>
+	</insert>
+	
+	<delete id="delGwa" parameterClass="Gwa">
+		<isNotEmpty property="gwaPk">
+		delete from gwa where gwa_pk = #gwaPk#
+		</isNotEmpty>
+	</delete>
+	
+	<update id="modGwa" parameterClass="Gwa">
+		update gwa set gwa_num = #gwaNumTo# where 1 = 1
+		<isNotEqual property="gwaNum" compareValue="0" prepend="AND"> 
+			gwa_num = #gwaNum#
+		</isNotEqual>
+		<isNotEqual property="gwaPk" compareValue="0" prepend="AND"> 
+			gwa_pk = #gwaPk#
+		</isNotEqual>
+	</update>
+	
+	<select id="getCon" parameterClass="Gwa" resultClass="Content">
+		select con_pk conPk, gwa_pk gwaPk, cat_pk catPk from content
+		<isNotEmpty property="gwaPk">
+			where gwa_pk = #gwaPk#
+		</isNotEmpty>
+		order  by cat_pk asc
+	</select>
+	
+	<delete id="delCon" parameterClass="Content">
+		delete from content where gwa_pk = #gwaPk#
+	</delete>
+	
+	<insert id="addCon" parameterClass="Content">
+		insert into content values(con_pk_seq.nextVal, #gwaPk#, #catPk#)
+	</insert>
+	
+	<!-- 과별 컨텐츠 관리 끝 -->
+	<!-- 강의관리 시작 -->
+	
+	<!-- 목록 카운팅 -->
+	<select id="getLectureCnt" resultClass="Lecture">
+		select count(lecture_pk) cnt from lecture
+	</select>
+	
+	<!-- 강의목록조회 (검색조건 없는 페이징) -->
+	<select id="getLectureList" parameterClass="java.util.Map" resultClass="Lecture">
+		<isNotEmpty property="start">
+		  <isNotEmpty property="end">
+			SELECT * FROM ( 
+				SELECT  A.*, ROWNUM RNUM FROM
+		       (
+			</isNotEmpty>
+		</isNotEmpty> 
+		select
+			lecture_pk lecturePk,
+			lecture_name lectureName,
+			TO_CHAR(lecture_startdate, 'YYYY-MM-DD') lectureStartdate,
+			TO_CHAR(lecture_enddate, 'YYYY-MM-DD') lectureEnddate,
+			lecture_teacher_pk  lectureTeacherPk,
+			member_name lectureTeacher,
+			TO_CHAR(lecture_regdate, 'YYYY-MM-DD') lectureRegdate,
+			case when sysdate &lt; lecture_startdate then '강의전'
+			     when lecture_startdate &lt;= sysdate and sysdate &lt;= lecture_enddate then '강의중'
+			     when lecture_enddate &lt; sysdate then '강의완료' end 
+			lectureState
+		FROM lecture A, member B 
+		WHERE a.lecture_teacher_pk = b.member_pk
+		ORDER BY lectureState desc, lecture_startdate asc
+		<isNotEmpty property="start">
+			<isNotEmpty property="end">
+				) A
+				WHERE ROWNUM &lt;= $end$
+			)
+			WHERE RNUM &gt; $start$
+			</isNotEmpty>
+		</isNotEmpty>
+	</select>
+	
+	<!-- 강의추가 -->
+	<insert id="addLecture" parameterClass="Lecture">
+		insert into lecture values 
+		(
+			lecture_pk_seq.nextval,
+			#lectureName#,
+			to_date(#lectureStartdate#),
+			to_date(#lectureEnddate#),
+			#lectureTeacherPk#,
+			sysdate
+		)
+	</insert>
+	
+	<!-- 강의수정 -->
+	<update id="modLecture" parameterClass="Lecture">
+		update lecture set 
+		<isNotEmpty property="lectureName">
+			lecture_name = #lectureName#,
+		</isNotEmpty>
+		<isNotEmpty property="lectureStartdate">
+			lecture_startdate = to_date(#lectureStartdate#),
+		</isNotEmpty>
+		<isNotEmpty property="lectureEnddate">
+			lecture_enddate = to_date(#lectureEnddate#),
+		</isNotEmpty>
+		<isNotEmpty property="lectureTeacherPk">
+			lecture_teacher_pk = #lectureTeacherPk#,
+		</isNotEmpty>
+		lecture_pk = #lecturePk#
+		where lecture_pk = #lecturePk#
+	</update>
+	
+	<!-- 강의삭제 (미사용)-->
+	<delete id="delLecture" parameterClass="Lecture">
+		delete from lecture where lecture_pk = #lecturePk#
+	</delete>
+	
+	
+	<!-- 강의관리 끝 -->
+	<!-- 학생배정 시작 -->
+	
+	<!-- 학생배정 조회 -->	
+	<select id="getStudents" parameterClass="Lecture" resultClass="Student">
+		select a.member_pk memberPk, a.member_name memberName, 'false' onLecture
+		from member a
+		where a.member_level = '5' 
+			and a.member_use = '1'
+			and a.member_pk not in (select member_pk from student where user_flag = '1')
+		union all
+		select a.member_pk memberPk, a.member_name memberName, 'true' onLecture
+		from member a, student b
+		where a.member_pk = b.member_pk
+			and user_flag = '1' and lecture_pk = #lecturePk#
+		order  by onLecture desc, memberName asc
+	</select>
+	
+	<!-- 강의 1 건 조회 (강의명조회) -->
+	<select id="getLecture" parameterClass="Lecture" resultMap="LectureResult">
+		select * from lecture where lecture_pk = #lecturePk#
+	</select>
+	
+	<!-- 강의에 학생 배정 -->
+	<insert id="addStudent" parameterClass="Student">
+		<selectKey keyProperty="studentPk" resultClass="int">
+			select student_pk_seq.nextval from dual
+		</selectKey>
+		insert into student values (
+			#studentPk#, #memberPk#, #lecturePk#, '1', null
+		)
+	</insert>
+	
+	
+	<!-- 학생 배정시 learn에 content별로 과목 넣어주기 -->
+	<insert id="addStudentToLearn" parameterClass="Learn">
+		insert into learn (learn_pk, con_pk, student_pk )  
+		values (learn_pk_seq.nextval, #conPk# , #studentPk#)
+	</insert>
+	
+	
+	
+	
+	<!-- 강의에서 학생 변경(제거 및 재배정) -->
+	
+	<update id="modStudent" parameterClass="Student">
+		update student set
+		<isEqual property="userFlag" compareValue="0">user_flag = '0'</isEqual>
+		<isEqual property="userFlag" compareValue="1">user_flag = '1'</isEqual>
+		,
+		<isNull property="cancelDate">cancel_date = null</isNull>
+		<isNotNull property="cancelDate">cancel_date = #cancelDate#</isNotNull>
+		where lecture_pk = #lecturePk#
+		<isNotEqual property="memberPk" compareValue="0" prepend="AND">
+			member_pk = #memberPk#
+		</isNotEqual>
+	</update>
+	
+	<!-- 학생배정 끝 -->
+	
+	
+	
+</sqlMap>

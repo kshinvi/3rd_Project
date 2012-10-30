@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC 
+"-//Apache Software Foundation/DTD Struts Configuration 2.0//EN"
+"http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+	<package name="game" namespace="/game" extends="emn-default">
+	
+		<!-- 게임(놀이터) 메인 페이지 -->
+		<action name="gameMain" class="com.emn.game.action.GameMainAction">
+			<result name="success">/WEB-INF/jsp/game/game_main.jsp</result>
+		</action>
+	 
+	 	<!-- 짝 맞추기 게임 -->
+		<action name="before_pairing" class="com.emn.game.action.PairingCardsAction" method = "form">
+			<result name="success">/WEB-INF/jsp/game/chooseGwa.jsp</result>
+		</action>
+		<action name="do_pairing" class="com.emn.game.action.PairingCardsAction" method = "chooseGwa">
+			<result name="success">/WEB-INF/jsp/game/pairingCards.jsp</result>
+			<result name="difficult">/WEB-INF/jsp/game/pairingCards2.jsp</result> 
+		</action>
+		
+		<!-- 블랙잭 게임 -->
+		<action name="blackJack" class="com.emn.game.action.BlackJackAction">
+			<result name="success">/WEB-INF/jsp/game/blackJack.jsp</result>
+		</action>
+		
+		<!-- 미로 찾기 게임 -->
+		<!-- <action name="findWords" class = "com.emn.game.action.MazeAction" method = "score">
+			<result>/WEB-INF/jsp/game/mazeScore.jsp</result>
+		</action> -->
+		<action name="playMaze" class = "com.emn.game.action.MazeAction" method = "form">
+			<result>/WEB-INF/jsp/game/playMaze.jsp</result>
+		</action>
+		<action name="mazeScore" class = "com.emn.game.action.MazeAction" method = "score">
+			<result>/WEB-INF/jsp/game/mazeScore.jsp</result>
+		</action>
+		
+		
+		<!-- 수지 구하기 게임-->
+		<action name="saveSuzi" class="com.emn.game.action.SaveSuziAction">
+			<result name="success">/WEB-INF/jsp/game/saveSuzi.jsp</result>
+		</action>
+		
+		<action name="nextSuzi" class="com.emn.game.action.SaveSuziAction" method = "refreshGame">
+			<result name="success">/WEB-INF/jsp/game/saveSuzi.jsp</result>
+		</action>
+				
+		<!-- 포인트 관련 액션 -->
+		<!-- 블랙잭  -->
+		<action name="game*" class="com.emn.game.action.BlackJackAction" method="{1}">
+			<result>/WEB-INF/jsp/content/blackJack.jsp</result>			
+		</action>
+		<!-- 짝맞추기 -->	
+		<action name="pairing*" class="com.emn.game.action.PairingCardsAction" method="{1}">
+			<result>/WEB-INF/jsp/content/playMaze.jsp</result>			
+		</action>
+		<!-- 수지 구하기 -->	
+		<action name="suzi*" class="com.emn.game.action.SaveSuziAction" method="{1}">
+			<result>/WEB-INF/jsp/content/saveSuzi.jsp.jsp</result>			
+		</action>
+		<!-- 단어 맞추기 미로 -->	
+		<action name="maze*" class="com.emn.game.action.SaveSuziAction" method="{1}">
+			<result>/WEB-INF/jsp/content/saveSuzi.jsp.jsp</result>			
+		</action>		
+		<action name="PointResult" class="com.emn.member.action.PointManagerAction" method="getDateResult">
+			<result name="success">/WEB-INF/jsp/member/pointManagerForm.jsp</result>
+		</action>
+	</package>
+</struts>

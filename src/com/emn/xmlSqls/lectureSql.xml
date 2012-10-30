@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC 
+"-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="lecture" >
+
+	<typeAlias alias="Member" type="com.emn.member.model.Member" />
+
+	<select id="sampleSelect" parameterClass="com.emn.lecture.model.Sample" resultClass="com.emn.lecture.model.Sample">
+		select sysdate as test1 from dual 
+	</select>
+
+	<!-- 강의현황용 LectureStatus 쿼리 -->	
+	<select id="selectLectureStatus" parameterClass="Member" resultClass="com.emn.lecture.model.LectureStatus">
+		SELECT
+			lecture.lecture_startdate startDate,
+			lecture.lecture_enddate endDate
+		FROM
+			member, student, lecture
+		WHERE
+			member.member_pk = #memberPk#
+			AND member.member_pk = student.member_pk
+			AND student.lecture_pk = lecture.lecture_pk
+			AND student.user_flag = '1'
+	</select>	
+	
+	<!-- 강의현황용 LectureStatus 쿼리(teacher도 pk로 저장되어 있고 member에 저장되어 한 번 더쿼리해야 함. -->
+	<select id="selectLectureStatusTeacher" parameterClass="Member" resultClass="com.emn.lecture.model.LectureStatus">
+		SELECT
+			member_name teacher
+		FROM
+			member
+		WHERE
+			member_pk = 
+				(
+					SELECT
+						lecture_teacher_pk teacherPk
+					FROM
+						member, student, lecture
+					WHERE
+						member.member_pk = #memberPk#
+						AND member.member_pk = student.member_pk
+						AND student.lecture_pk = lecture.lecture_pk
+						AND student.user_flag = '1'	 
+				)			
+	</select>
+	
+	<!-- 멤버와  -->
+	<select id="selectListLectureGwa" parameterClass="Member" resultClass="com.emn.lecture.model.LectureGwa">
+		SELECT
+			gwa_num gwaNumber,
+			gwa_name gwaName,
+			cat_name categoryName,
+			start_date startDate,
+			end_date endDate
+		FROM
+			student, learn, content, category, gwa
+		WHERE
+			member_pk = #memberPk#
+			AND student.student_pk = learn.student_pk
+			AND learn.con_pk = content.con_pk
+			AND content.gwa_pk = gwa.gwa_pk
+			AND content.cat_pk = category.cat_pk
+		ORDER BY 
+			gwa_num ASC, content.cat_pk ASC
+	</select>
+	
+	<!-- 강의선택 카테고리 리스트 -->
+	<select id="selectLectureCategoryList" parameterClass="Member" resultClass="com.emn.lecture.model.LectureCategory">
+		SELECT
+			gwa_name gwaName,
+			gwa.gwa_pk gwaPk,
+			cat_name categoryName,
+			category.cat_pk categoryPk,
+			start_date startTime,
+			end_date endTime
+		FROM
+			student, learn, content, gwa, category  
+		WHERE
+			student.member_pk = #memberPk#
+			AND student.student_pk = learn.student_pk
+			AND learn.con_pk = content.con_pk
+			AND content.gwa_pk = gwa.gwa_pk
+			AND content.cat_pk = category.cat_pk
+		ORDER BY 
+			gwa_num ASC, content.cat_pk ASC
+	</select>
+	
+	
+	<!-- 단어 리스트 -->
+	<select id="selectWordArrayList" parameterClass="com.emn.content.model.Word" resultClass="com.emn.content.model.Word">
+		SELECT
+			word_pk wordPk,
+			wnumber,
+			wclass,
+			wclass2,
+			hiragana,
+			katakana,
+			kanji,
+			hangul,
+			mp3_fname mp3Fname,
+			img_fname imgFname,
+			wlevel,
+			gwa_pk 
+		FROM word
+		WHERE
+			gwa_pk = #gwaPk#
+		ORDER BY
+			wnumber ASC
+	</select>
+	
+	<!-- 문법노트 xml파일명 -->
+	<select id="selectGrammarNoteXmlFileName" parameterClass="com.emn.content.model.Grammar" resultClass="com.emn.content.model.Grammar">
+		SELECT
+			gwa_pk gwaPk, 
+			xml_fname xmlFname
+		FROM 
+			grammar
+		WHERE 
+			gwa_pk = #gwaPk#
+	</select>
+	
+	<!-- 대화하기 -->
+	<select id="selectDialog" parameterClass="com.emn.content.model.Dialog" resultClass="com.emn.content.model.Dialog">
+		SELECT
+			dialog_pk dialogPk,
+			xml_fname xmlFname,
+			mp3_fname mp3Fname,
+			gwa_pk gwaPk			
+		FROM 
+			dialog
+		WHERE 
+			gwa_pk = #gwaPk#
+	</select>
+	
+	<!-- 읽기 -->
+	<select id="selectReading" parameterClass="com.emn.content.model.Reading" resultClass="com.emn.content.model.Reading">
+		SELECT
+			reading_pk readingPk,
+			img_fname imgFname,
+			gwa_pk gwaPk,
+			xml_fname xmlFname,
+			mp3_fname mp3Fname
+		FROM 
+			reading
+		WHERE 
+			gwa_pk = #gwaPk#
+	</select>
+	
+	<!-- 입장시간 select -->
+	<select id="selectStartTime" parameterClass="com.emn.lecture.model.StartTimeSelectBean" resultClass="com.emn.lecture.model.StartTimeSelectBean">
+		SELECT
+			member_pk memberPk;
+			gwa_num gwaNumber;
+			cat_pk categoryPk;
+			start_date startTime;						
+		FROM 
+			student, learn, content, gwa, category
+		WHERE 
+			member_pk = #memberPk#
+			AND student.student_pk = learn.student_pk
+			AND learn.con_pk = content.con_pk
+			AND content.gwa_pk = gwa.gwa_pk
+			AND content.cat_pk = category.cat_pk
+	</select>	
+	
+	<!-- 업데이트문 -->
+
+	<!-- 입장시간 업데이트 -->
+	<update id="updateStartTime" parameterClass="com.emn.lecture.model.TimeUpdateBean">
+		UPDATE 
+			learn 
+		SET
+			start_date = SYSDATE
+		WHERE
+			(	SELECT
+					start_date
+				FROM
+					learn, member, student, content
+				WHERE
+					member.member_pk = student.member_pk
+					AND student.student_pk = learn.student_pk
+					AND learn.con_pk = content.con_pk
+					AND member.member_pk = #memberPk#
+					AND content.gwa_pk = #gwaPk#
+					AND content.cat_pk = #categoryPk#
+			) IS NULL
+			AND con_pk = 
+				(	SELECT
+						learn.con_pk
+					FROM
+						student, learn, content
+					WHERE
+						student.student_pk = learn.student_pk
+						AND learn.con_pk = content.con_pk
+						AND student.member_pk = #memberPk#
+						AND content.gwa_pk = #gwaPk#
+						AND content.cat_pk = #categoryPk#
+				)
+	</update>
+	
+	<!-- 퇴장시간 업데이트 -->
+	<update id="updateEndTime" parameterClass="com.emn.lecture.model.TimeUpdateBean">
+		UPDATE 
+			learn 
+		SET
+			end_date = SYSDATE
+		WHERE
+			con_pk = 
+			(	SELECT
+					learn.con_pk
+				FROM
+					student, learn, content
+				WHERE
+					student.student_pk = learn.student_pk
+					AND learn.con_pk = content.con_pk
+					AND student.member_pk = #memberPk#
+					AND content.gwa_pk = #gwaPk#
+					AND content.cat_pk = #categoryPk#
+			)
+	</update>
+	
+</sqlMap>

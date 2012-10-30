@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="common" >
+
+	<typeAlias alias="Gwa" type="com.emn.content.model.Gwa"/>
+	<typeAlias alias="Member" type="com.emn.member.model.Member"/>
+	
+	<resultMap id="GwaResult" class="Gwa">
+	  	<result property="gwaPk" column="GWA_PK"/>
+	  	<result property="gwaName" column="GWA_NAME"/>
+	  	<result property="gwaNum" column="GWA_NUM"/>
+	</resultMap>
+
+	<select id="getGwaSelect" parameterClass="Gwa" resultMap="GwaResult"> 
+		select * from gwa where 1=1
+		<isNotNull property="Gwa" prepend="AND">
+			gwa_pk = #gwaPk# 
+		</isNotNull>
+		order by gwa_num
+	</select>
+	
+	<select id="getMemList" parameterClass="Member" resultClass="Member">
+		select 
+			member_pk memberPk,
+			member_id memberId,
+			member_name memberName,
+			member_email memberEmail,
+			member_level memberLevel,
+			member_regdate memberRegdate
+		from member
+		where member_use = '1'
+		<isNotEmpty property="memberLevel" prepend="AND">
+			member_level = #memberLevel#
+		</isNotEmpty>
+		order by member_name
+	</select>
+	
+</sqlMap>

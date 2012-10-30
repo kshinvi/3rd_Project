@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC 
+"-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="member">
+
+	<typeAlias alias="Member" type="com.emn.member.model.Member" />
+	<typeAlias alias="ChangePassword" type="com.emn.member.model.ChangePasswordBean" />
+	
+	<!-- 회원 리스트 보기 -->
+	<select id="getAllMember" resultClass="Member">
+		SELECT
+			member_pk memberPk,
+			member_id memberId,
+			member_pw memberPw,
+			member_name memberName,
+			member_email memberEmail,
+			member_level memberLevel,
+			member_use memberUse,
+			member_regdate memberRegdate
+		FROM 
+			member
+	</select>
+
+	<!-- 로그인 -->
+	<select id="login" parameterClass="Member" resultClass="Member">
+		SELECT
+			member_pk memberPk,
+			member_id memberId,
+			member_pw memberPw,
+			member_name memberName,
+			member_email memberEmail,
+			member_level memberLevel,
+			member_use memberUse,
+			member_regdate memberRegdate,
+			member_point memberPoint
+		FROM 
+			member
+		WHERE 
+			member_id = #memberId# 
+			AND member_pw = #memberPw# 
+	</select>
+	
+	<!-- ID와 EMAIL등 중복되면 안되는 것들 있는지 찾기 -->
+	<select id="selectMemberIdEmail" parameterClass="Member" resultClass="Member">
+		SELECT
+			member_id memberId,
+			member_email memberEmail
+		FROM 
+			member
+		WHERE 
+			member_id = #memberId#
+			OR member_email = #memberEmail#
+	</select>
+	
+	<!-- ID찾기 -->
+	<select id="findId" parameterClass="Member" resultClass="Member">
+		SELECT
+			member_pk memberPk,
+			member_id memberId,
+			member_pw memberPw,
+			member_name memberName,
+			member_email memberEmail,
+			member_level memberLevel,
+			member_use memberUse,
+			member_regdate memberRegdate
+		FROM 
+			member
+		WHERE 
+			member_email = #memberEmail#
+	</select>
+
+	<!-- ID/비밀번호 찾기 : 관리자 모드 -->
+	<select id="findIdPw" parameterClass="Member" resultClass="Member">
+		SELECT
+			member_pk memberPk,
+			member_id memberId,
+			member_name memberName,
+			member_email memberEmail,
+			member_level memberLevel,
+			member_use memberUse
+		FROM 
+			member
+		WHERE 
+			member_id LIKE '%'||#memberId#||'%' 
+			OR member_name LIKE '%'||#memberName#||'%'
+	</select>
+	
+	<!-- 회원 정보 보기 : 관리자 모드 -->
+	<select id="selectUser" parameterClass="Member" resultClass="Member">
+		SELECT
+			member_pk memberPk,
+			member_id memberId,
+			member_pw memberPw,
+			member_name memberName,
+			member_email memberEmail,
+			member_level memberLevel,
+			member_use memberUse,
+			member_regdate memberRegdate
+		FROM 
+			member
+		WHERE 
+			member_pk = #memberPk#
+	</select>
+
+	<!-- 인서트문 -->
+	<!-- 회원 가입하기 -->
+	<insert id="insertMember" parameterClass="Member">
+		INSERT INTO
+			Member(
+				MEMBER_PK, 
+				member_id, 
+				member_pw, 
+				member_name, 
+				member_email, 
+				member_level,
+				member_use, 
+				member_regdate,
+				member_point
+			)
+		VALUES(
+			MEMBER_PK_SEQ.NEXTVAL,
+			#memberId#,
+			#memberPw#,
+			#memberName#,
+			#memberEmail#,
+			5,
+			1,
+			SYSDATE,
+			1000
+		)
+	</insert>
+
+
+	<!-- 업데이트문 -->
+	<!-- 회원 업데이트 -->
+	<update id="updateMember" parameterClass="Member">
+		UPDATE
+			member
+		SET
+			member_name = #memberName#,
+			member_email = #memberEmail#
+		WHERE 
+			member_id = #memberId#
+	</update>
+	
+	<!-- 비밀번호 업데이트 -->
+	<update id="updatePassword" parameterClass="ChangePassword">
+		UPDATE
+			member
+		SET
+			member_pw = #newPassword#
+		WHERE 
+			member_id = #memberId#
+			AND member_pw = #oldPassword#
+	</update>
+	
+	
+	<!-- 회원 탈퇴 -->
+	<update id="withdrawMember" parameterClass="Member">
+		UPDATE 
+			member
+		SET
+			member_use = 0
+		WHERE 
+			member_id = #memberId#
+	</update>
+	
+	
+	<!-- 회원 업데이트 : 관리자 모드 -->
+	<update id="updateAdmin" parameterClass="Member">
+		UPDATE 
+			member
+		SET
+			member_name = #memberName#,
+			member_email = #memberEmail#,
+			member_level = #memberLevel#,
+			member_use = #memberUse#
+		WHERE 
+			member_pk = #memberPk#
+	</update>
+	
+</sqlMap>

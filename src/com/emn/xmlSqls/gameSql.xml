@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="game" >
+	<typeAlias alias="Card" type="com.emn.game.model.PairingCard"/>
+	<typeAlias alias="Point" type="com.emn.game.model.PointBean"/>
+	<typeAlias alias="Member" type="com.emn.member.model.Member"/>
+	<typeAlias alias="MazeWord" type="com.emn.game.model.MazeWord"/>
+	
+	<!-- PairingCard 관련 -->
+	<select id="getCards" parameterClass="Card" resultClass="Card"> 
+		select * from test_pairing where GWA &gt;= #value1# and GWA &lt;= #value2#
+	</select>	
+	<select id="getGwas" resultClass="Card">
+		select distinct GWA from test_pairing
+	</select>
+	
+	<!-- saveSuzi 관련 -->
+	<select id="getAllWords" parameterClass="Card" resultClass="Card"> 
+		select * from test_pairing
+	</select>	
+	<select id="nextSuzi" resultClass="Card">
+		select distinct GWA from test_pairing
+	</select>
+	
+	<!-- Point 관련 -->
+	<select id="getPoint" parameterClass="Member" resultClass="Member">
+		Select member_point memberPoint from member where member_pk = #memberPk#
+	</select>
+	<insert id="insertPoint" parameterClass="Point">
+		INSERT INTO 
+			POINT 
+				VALUES( 
+					point_pk_seq.nextval, 
+					#memberPk#, 
+					#detail#, 
+					#point#, 
+					SYSDATE
+				)
+	</insert>
+	<update id="updatePoint" parameterClass="Member">
+		UPDATE 
+			MEMBER 
+				SET member_point = member_point + #memberPoint# 
+				WHERE member_pk = #memberPk#
+	</update>
+	
+	<!-- Maze 관련 -->
+	<!-- <select id="getCards" parameterClass="Card" resultClass="Card"> 
+		select * from mazeword where GWA &gt;= #value1# and GWA &lt;= #value2#
+	</select>-->	
+	<select id="findGwas" resultClass="MazeWord">
+		select distinct GWA from mazeword
+	</select>
+	
+</sqlMap>

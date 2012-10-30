@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMapConfig PUBLIC 
+"-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"      
+"http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+
+	<transactionManager type="JDBC" commitRequired="false">
+		<dataSource type="SIMPLE">
+			<property name="JDBC.Driver" value="oracle.jdbc.driver.OracleDriver"/>
+			<property name="JDBC.ConnectionURL" value="jdbc:oracle:thin:@203.233.196.185:1521:xe"/>
+			<property name="JDBC.Username" value="emn"/>
+			<property name="JDBC.Password" value="momiji"/>
+		</dataSource>
+	</transactionManager>
+
+	<!-- sql lists -->
+	<sqlMap resource="com/emn/xmlSqls/commonSql.xml"/>  
+	<sqlMap resource="com/emn/xmlSqls/lectureSql.xml"/>
+	<sqlMap resource="com/emn/xmlSqls/contentSql.xml"/>
+	<sqlMap resource="com/emn/xmlSqls/memberSql.xml"/>
+	<sqlMap resource="com/emn/xmlSqls/gameSql.xml"/>
+	<sqlMap resource="com/emn/xmlSqls/studySql.xml"/>
+	<sqlMap resource="com/emn/xmlSqls/pointSql.xml"/>	
+</sqlMapConfig>
+ 

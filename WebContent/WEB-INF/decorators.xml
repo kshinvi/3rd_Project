@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<decorators defaultdir="/WEB-INF/jsp/decorators">
+
+	<decorator name="head" page="head.jsp"/>
+	<decorator name="top" page="top.jsp"/>
+	<decorator name="bottom" page="bottom.jsp"/>
+	<decorator name="left" page="left.jsp"/>
+	
+	<!-- 데코레이터 전혀 미적용 -->
+	<decorator name="data" page="data.jsp">
+		<pattern>/study/getWordbook.action</pattern>
+	</decorator>
+	
+	<!-- 팝업용 -->
+    <decorator name="nondeco" page="nonDeco.jsp">
+    	<pattern>/study/changeRememberFlag.action</pattern>
+    	<pattern>/study/editWordbookWlevel.action</pattern>
+    	<pattern>/lecture/lectureUpdateEndTime.action</pattern>
+		<pattern>/lecture/lectureWord.action</pattern>
+		<pattern>/lecture/lectureGrammarNote.action</pattern>
+		<pattern>/lecture/lectureDialog.action</pattern>
+		<pattern>/lecture/lectureReading.action</pattern>
+		<pattern>/content/lecture_pop*</pattern>
+		<pattern>/content/lecture_popup.action</pattern><!-- 강의관리-학생배정팝업 -->
+		<pattern>/game/blackJack.action</pattern><!-- 게임-블랙잭 -->
+		<pattern>/game/do_pairing.action</pattern><!-- 게임-사천성 -->
+		<pattern>/game/before_pairing.action</pattern><!-- 게임-사천성 -->
+		<pattern>/game/playMaze.action</pattern><!-- 게임-미로 -->
+		<pattern>/game/mazeScore.action</pattern><!-- 게임-미로 -->
+    	<pattern>/game/saveSuzi.action</pattern><!-- 게임-수지 구하기 -->
+		<pattern>/game/nextSuzi.action</pattern><!-- 게임-수지 구하기 -->
+    </decorator>
+    
+    <!-- 자습실 -->
+    <decorator name="study" page="sub_study.jsp">
+    	<pattern>/study/quest_*</pattern>
+    	<pattern>/study/studyWordbook.action</pattern>
+    	<pattern>/study/getWordbook.action</pattern>
+    </decorator>
+    
+    <!-- 강의관리 -->
+    <decorator name="content1" page="sub_content1_manager.jsp">
+    	<pattern>/content/lecture*</pattern>
+    </decorator>
+    
+    <!-- 컨텐츠관리 -->
+    <decorator name="content2" page="sub_content2_manager.jsp">
+		<pattern>/content/word*</pattern>
+		<pattern>/content/other*</pattern>
+		<pattern>/content/content_*</pattern><!-- 과관리 -->
+    </decorator>
+
+    <!-- 왼쪽메뉴 없음 - 놀이터, 강의현황, 평가현황, 회원관리 -->
+    <decorator name="game" page="sub_game.jsp">
+		<pattern>/game/gameMain.action</pattern>
+		<pattern>/teacher/LearnStatus.action</pattern><!-- 강의현황 -->
+		<pattern>/teacher/exam*.action</pattern><!-- 평가현황 -->
+		<pattern>/member/*</pattern><!-- 회원관리 -->
+		<pattern>/lecture/lectureStatus.action</pattern>
+		<pattern>/lecture/lectureCategoryList.action</pattern>
+		<pattern>/content/lecture_list.action</pattern>
+    </decorator>
+    
+    <decorator name="except">
+		<pattern>/*</pattern>
+		<pattern>/*.html</pattern>		
+    </decorator>
+    
+	<!-- 기본접근 -->    
+	<decorator name="main" page="main.jsp">
+		<pattern>/*.action</pattern>		
+	</decorator>
+     
+</decorators>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC 
+"-//Apache Software Foundation/DTD Struts Configuration 2.0//EN"
+"http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+	<package name="member" namespace="/member" extends="emn-default">
+
+		<!-- 로그인 -->
+		<action name="UserLoginForm">
+			<result>/WEB-INF/jsp/member/userLogin.jsp</result>
+		</action>
+		<action name="UserLoginAction" class="com.emn.member.action.UserLoginAction">
+			<interceptor-ref name="params" />
+			<interceptor-ref name="workflow" />
+			<result name="input">/WEB-INF/jsp/member/userLogin.jsp</result>
+			<result name="success">/WEB-INF/jsp/member/userLogin.jsp</result>
+		</action>
+		
+		<!-- 로그아웃 -->
+		<action name="UserLogoutAction" class="com.emn.member.action.UserLogoutAction">
+			<result name="input">/WEB-INF/jsp/member/top_login.jsp</result>
+			<result name="success">/WEB-INF/jsp/member/userLogin.jsp</result>
+		</action>
+
+		<!-- 회원가입 -->
+		<action name="UserRegForm" class="com.emn.member.action.UserRegAction" method="restLoginForm">
+			<result>/WEB-INF/jsp/member/userRegForm.jsp</result>
+		</action>
+		<action name="UserRegAction" class="com.emn.member.action.UserRegAction">
+			<result name="input">/WEB-INF/jsp/member/userRegForm.jsp</result>
+			<result name="success">/WEB-INF/jsp/member/userRegSuccess.jsp</result>
+		</action>
+		
+		<!-- 회원 정보 수정폼 액션(기본정보) -->
+		<action name="editBasicInfoForm">
+			<result>/WEB-INF/jsp/member/editBasicInfoForm.jsp</result>
+		</action>
+		<action name="editBasicInfoForm2" class="com.emn.member.action.EditBasicInfoFormAction">
+			<result name="input">/WEB-INF/jsp/member/editBasicInfoForm.jsp</result>
+			<result name="success">/WEB-INF/jsp/member/editBasicInfoForm2.jsp</result>
+		</action>
+		<action name="changeBasicInfo" class="com.emn.member.action.ChangeBasicInfoAction">
+			<result name="success">/WEB-INF/jsp/member/editBasicInfoSuccess.jsp</result>
+		</action>
+		
+		<!-- 회원 정보 수정폼 액션(비밀번호) -->
+		<action name="changePasswordForm">
+			<result>/WEB-INF/jsp/member/changePasswordForm.jsp</result>
+		</action>
+		<action name="changePassword" class="com.emn.member.action.ChangePasswordAction">
+			<result name="input">/WEB-INF/jsp/member/changePasswordForm.jsp</result>
+			<result name="success">/WEB-INF/jsp/member/changePasswordForm.jsp</result>
+		</action>
+		
+
+		<!-- 회원 정보 수정 -->
+		<action name="UserUpdateForm" class="com.emn.member.action.UserUpdateAction"
+			method="getUser">
+			<interceptor-ref name="params" />
+			<result name="success">/WEB-INF/jsp/member/userUpdateForm.jsp</result>
+		</action>
+		<action name="UserUpdateAction" class="com.emn.member.action.UserUpdateAction">
+			<interceptor-ref name="params" />
+			<result name="input">/WEB-INF/jsp/member/userUpdateForm.jsp</result>
+			<result name="success">/WEB-INF/jsp/member/top_login.jsp</result>
+		</action>
+		
+		<!-- 회원 탈퇴 -->
+		<action name="UserWithdraw" class="com.emn.member.action.UserWithdraw">
+			<result name="input">/WEB-INF/jsp/member/userUpdateForm.jsp</result>
+			<result name="success">/WEB-INF/jsp/member/userLogin.jsp</result>
+		</action>
+		
+		<!-- ID/비밀번호 찾기 -->
+		<action name="UserFinderForm">
+			<result>/WEB-INF/jsp/member/userFinderForm.jsp</result>
+		</action>
+		<action name="UserFinderAction" class="com.emn.member.action.UserFinderAction">
+			<result name="input">/WEB-INF/jsp/member/userFinderForm.jsp</result>
+			<result name="success">/WEB-INF/jsp/member/userFinderForm.jsp</result>
+		</action>
+		
+		<!-- 회원 ID/비밀번호 찾기 : 관리자 모드 -->
+		<action name="FindManagerAction" class="com.emn.member.action.UserFinderAction" method="getUser">
+			<result name="input">/WEB-INF/jsp/member/userManagerForm.jsp</result>
+			<result name="success">/WEB-INF/jsp/member/userManagerForm.jsp</result>
+		</action>
+		
+		<!-- 회원 목록 보기 : 관리자 모드 -->
+		<action name="UserManagerForm" class="com.emn.member.action.UserManagerAction"
+			method="getUser">
+			<interceptor-ref name="chain" />
+			<result name="success">/WEB-INF/jsp/member/userManagerForm.jsp</result>
+		</action>
+
+		<!--회원 정보 수정 : 관리자 모드 -->
+		<action name="ManagerUpdateForm" class="com.emn.member.action.ManagerUpdateAction" method="getUser">
+			<result>/WEB-INF/jsp/member/managerUpdateForm.jsp</result>
+		</action>
+		<action name="ManagerUpdateAction" class="com.emn.member.action.ManagerUpdateAction">
+			<result name="input">/WEB-INF/jsp/member/managerUpdateForm.jsp</result>
+			<result name="success" type="chain">
+				<param name="actionName">UserManagerForm</param>
+			</result>
+		</action>
+		
+		<!-- 포인트 관리 : 사용자 모드 -->
+		<action name="pointManagerForm" class="com.emn.member.action.PointManagerAction">
+			<result name="success">/WEB-INF/jsp/member/pointManagerForm.jsp</result>
+		</action>
+		
+		<!-- 포인트 날짜별 관리 : 사용자 모드 -->
+		<action name="PointResult" class="com.emn.member.action.PointManagerAction" method="getDateResult">
+			<result name="success">/WEB-INF/jsp/member/pointManagerForm.jsp</result>
+		</action>
+		
+		<action name="PointAllResult" class="com.emn.member.action.PointAllResultAction">
+			<interceptor-ref name="modelDriven"/>
+			<interceptor-ref name="params"/>
+			<result name="success">/WEB-INF/jsp/member/pointAllResult.jsp</result>
+		</action>	
+	</package>
+</struts>

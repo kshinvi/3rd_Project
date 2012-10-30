@@ -1,0 +1,14 @@
+@CHARSET "UTF-8";
+@IMPORT url("lectureGrammarNote.css");
+@IMPORT url("memberLogin.css");
+img{
+	border:0px;
+}
+.divMessage{
+	font-size:15px;
+	font-family:굴림;
+	font-style:bold;
+	color:red;
+	margin: 0px 0px 0px 0px;
+}
+body { background-color: #ffffee;}

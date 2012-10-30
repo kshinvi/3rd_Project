@@ -1,0 +1,124 @@
+@CHARSET "UTF-8";
+@font-face {font-family: 우리바탕; src:url( http://pds6.egloos.com/pds/200711/20/24/wooriBatang.eot);} 
+
+.LectureTd1{
+	width:230px;
+	height:10px;
+}
+
+.LectureTd2{
+	width:230px;
+	height:10px;
+}
+
+.LectureTd3{
+	width:280px;
+	height:10px;
+}
+
+.LectureTd4{
+	width:100px;
+	height:10px;
+	text-align: center;
+}
+
+.LectureTd5{
+	width:130px;
+	height:10px;
+	text-align: center;
+}
+
+.LectureWordTable{
+	font-family: meiryo, MSPGothic;
+	font-weight: bold;
+	background-color: #DDDDDD;
+	padding: 5px;
+}
+
+.LectureWordTable th{
+	background-color: #558888;
+	color: #EEEEEE;
+	padding: 5px;
+}
+
+.LectureWordTable td{
+	background-color: #DDFFDD;
+	padding: 5px;
+}
+
+.LectureTableGrammar{
+	font-weight: bold;
+	background-color: #FFDDDD;
+	
+}
+
+.grammarTitle{
+	font-size: 40px;	
+}
+
+.grammarContent{
+	font-size: 20px;
+	line-height: 30px;
+}
+
+.grammarCaution{
+	font-size: 18px;
+	color: #FF3333;
+	line-height: 25px;
+}
+
+.grammarExam{
+	font-size: 20px;
+	line-height: 25px;
+}
+
+.dialogTable{
+	width: 100%;
+	padding: 5px;
+	margin: 10px auto;
+	border-spacing: 0px;
+	border-style: none;
+}
+
+.tdSpeakerKanji{
+	width: 300px;
+}
+
+.trSpeakertitle{
+	background-color: #333333;
+	color : #ffffff;
+	font-weight: bolder;
+}
+
+.trSpeakeryamada{
+	background-color: #AADDFF;
+}
+
+.trSpeakersato{
+	background-color: #FFAADD;
+}
+
+.trSpeakersantos{
+	background-color: #AAFFDD;
+}
+
+.trSpeakermiller{
+	background-color: #AAFFFF;
+}
+
+.readingTable{
+	font-family: meiryo, msgothic;	
+	width: 80%;
+	margin: 0px auto;
+}
+
+.readingSpan{
+	font-Size: 20px;
+	line-height : 30px;
+}
+
+.divButton {
+	width: 800px;
+	text-align: center;
+	margin: 0px auto;
+}

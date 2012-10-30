@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC 
+"-Apache Software Foundation//DTD Struts Configuration 2.0//EN" 
+"http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+	<!-- constants -->
+	<constant name="struts.i18n.encoding" value="UTF-8"/>
+	<constant name="struts.ui.theme" value="simple"/>	
+	<constant name="struts.multipart.saveDir" value="D:/upload/"/><!-- 임시파일업로드디렉토리 -->
+	<constant name="struts.multipart.maxSize" value="2000000000"/>
+	
+	<!-- emn-default -->
+	<package name="emn-default" extends="struts-default">
+		
+		<!-- intercepter -->
+		<interceptors>
+			<interceptor name="sessionChk" class="com.emn.common.EmnIntercepter" />
+		</interceptors>
+		
+		<!-- global result -->
+		<global-results>
+	             <result name="login" type="redirect">/member/UserLoginForm.action</result>
+	    </global-results>
+	</package>
+	
+	
+	
+	<!-- actions -->
+	<include file="com/emn/lecture/lecture.xml" />
+	<include file="com/emn/teacher/teacher.xml" />
+ 	<include file="com/emn/content/content.xml" />
+	<include file="com/emn/member/member.xml" />
+	<include file="com/emn/game/game.xml" />
+	<include file="com/emn/study/study.xml" />
+	
+</struts>

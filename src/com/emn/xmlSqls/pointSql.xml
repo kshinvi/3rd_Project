@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC 
+"-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="point">
+
+	<!-- 포인트 가져오기 -->
+	<typeAlias alias="PointDetail" type="com.emn.game.model.PointDetail"/>
+	<typeAlias alias="Point" type="com.emn.game.model.PointBean"/>
+	<typeAlias alias="PointRegDate" type="com.emn.game.model.PointRegDate"/>
+	<typeAlias alias="Member" type="com.emn.member.model.Member" />
+	
+	<!-- 셀렉트문 -->
+	<!-- 회원 포인트 현황 가져오기 -->
+	<select id="getMemberPoint" parameterClass="Member" resultClass="Point">
+		SELECT
+			point_pk pointPk,
+			member_pk memberPk,
+			detail detail,
+			point point,
+			to_char(trunc(regdate), 'yyyy/mm/dd') regdate
+		FROM
+			point
+		WHERE member_pk = #memberPk#		
+		ORDER BY point_pk DESC
+	</select>
+	
+	<!-- 게임별 포인트 현황 가져오기 -->
+	<select id="getDetail" parameterClass="Member" resultClass="PointDetail">
+		SELECT
+			Sum(point) sum, detail 
+		FROM
+			point
+		WHERE member_pk = #memberPk#	
+		GROUP BY detail		
+		ORDER BY detail DESC
+	</select>
+	
+	<!-- 날짜별 포인트 현황 가져오기 -->
+	<select id="getRegDate" parameterClass="Member" resultClass="PointRegDate">
+		SELECT
+			trunc(regdate) regdate, 
+			sum(point) sum, 
+			count(detail) count
+		FROM 
+			point
+		WHERE member_pk = #memberPk#
+		GROUP BY trunc(regdate)
+		ORDER BY regdate DESC
+	</select>
+	<select id="getUserRegDate" parameterClass="Member" resultClass="PointRegDate" >
+		SELECT
+			to_char(trunc(regdate), 'yyyy-mm-dd') regdate, sum(point) sum, count(detail) count
+		FROM 
+			point
+		WHERE member_pk = #memberPk# AND trunc(regdate) = to_date(#regdate#, 'yyyy/mm/dd')
+		GROUP BY trunc(regdate)
+	</select>
+</sqlMap>
